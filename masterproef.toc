@@ -1,0 +1,37 @@
+\contentsline {chapter}{\numberline {1}Precise probabilities}{2}
+\contentsline {section}{\numberline {1.1}Sets}{2}
+\contentsline {section}{\numberline {1.2}Measures and probabilities}{2}
+\contentsline {section}{\numberline {1.3}Bayesian viewpoint}{2}
+\contentsline {section}{\numberline {1.4}Bayes' rule}{2}
+\contentsline {section}{\numberline {1.5}Decision theory?}{3}
+\contentsline {chapter}{\numberline {2}Classification}{4}
+\contentsline {section}{\numberline {2.1}The hypothesis set}{4}
+\contentsline {paragraph}{Example: linear functions.}{4}
+\contentsline {section}{\numberline {2.2}Cost and utility function}{5}
+\contentsline {paragraph}{Expected utility of a single hypothesis.}{5}
+\contentsline {section}{\numberline {2.3}Generalization and bias-variance}{6}
+\contentsline {paragraph}{Generalization}{6}
+\contentsline {paragraph}{Bias and variance}{6}
+\contentsline {section}{\numberline {2.4}Training algorithm}{7}
+\contentsline {section}{\numberline {2.5}Cross-Validation}{7}
+\contentsline {chapter}{\numberline {3}Naive Bayes classifier}{8}
+\contentsline {section}{\numberline {3.1}Bayes classifier}{8}
+\contentsline {section}{\numberline {3.2}Conditional Independence}{9}
+\contentsline {section}{\numberline {3.3}Examples}{10}
+\contentsline {section}{\numberline {3.4}Decision rules}{11}
+\contentsline {paragraph}{Maximize expected utility}{12}
+\contentsline {section}{\numberline {3.5}Training the classifier}{13}
+\contentsline {paragraph}{Guessing}{13}
+\contentsline {paragraph}{Use data}{13}
+\contentsline {paragraph}{Laplace smoothing}{14}
+\contentsline {chapter}{\numberline {4}Imprecise probabilities}{15}
+\contentsline {section}{\numberline {4.1}Formalisms}{15}
+\contentsline {section}{\numberline {4.2}Geometric interpretation}{15}
+\contentsline {chapter}{\numberline {5}Imprecise Naive Bayes classifier}{16}
+\contentsline {section}{\numberline {5.1}Decision rules}{16}
+\contentsline {section}{\numberline {5.2}Training algorithm}{16}
+\contentsline {chapter}{\numberline {6}Performance and comparison of precise and imprecise methods}{17}
+\contentsline {section}{\numberline {6.1}Measures of performance}{17}
+\contentsline {section}{\numberline {6.2}Precise Naive Bayes}{17}
+\contentsline {section}{\numberline {6.3}Imprecise Naive Bayes}{17}
+\contentsline {section}{\numberline {6.4}Discussion}{17}

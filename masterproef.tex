@@ -1,0 +1,302 @@
+\documentclass{report}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\theoremstyle{definition}
+\newtheorem{exmp}{Example}[section]
+\usepackage{tikz}
+\usetikzlibrary{shapes,backgrounds}
+\title{Titel}
+\author{Dries Naert}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\begin{abstract}
+\end{abstract}
+
+\section*{Introduction}
+
+\chapter{Precise probabilities}
+	\section{Sets}
+	\section{Measures and probabilities}
+	\section{Bayesian viewpoint}
+	\section{Bayes' rule}
+	In this section I will explain Bayes' rule, since this rule is the working mechanism of the Bayes classifier we'll construct later on. A simple way of explaining this rule is by letting an event correspond to a 2-dimensional geometric shape. The value of the probability of this event is then the area of the corresponding shape. The rule is here explained with 2 circular shapes. In general, this kind of setup is called an Euler diagram and a picture of the situation is drawn in \ref{figure:eulerfig}. Now suppose we see the picture and after that someone would assure us that event A actually has happened, some cutting and rescaling of the picture has to be done to fit it to the new information. \ref{figure:eulerfig2} is our new state of knowledge. Everything outside A has been cut off and the picture was rescaled so that $P'(A)=1$. This can be done by dividing all areas by the original area of A. The conditional probability of event B, given event A is its new area:
+	
+	\begin{equation}
+	P(B|A) = \frac{P(A \cap B)}{P(A)} \text{ .}
+	\end{equation}
+	This is the rule of Bayes. It gives a way of calculating the probability of event B, given event A (happened).
+	As a result of Bayes' rule, we also have a way of calculating $P(A \cap B)$, assuming we have information about $P(B|A)$ and $P(A)$. Calculating $P(B \cap A)$ this way is called the multiplication rule.\\
+	
+	\textbf{Example. } A man goes to a doctor and will undergo a test for a horrible disease. The result of this test can be positive (+) or negative (-). The probabilities of the test results, conditioned on the state of (not) being sick is given in table \ref{tabel:examplebayes}. The doctor tells the man that based on what he knows at that very moment, the probability of the man having the disease is $0.01$. If the test would be positive, what is the probability of the man having the disease? We can solve this by directly applying Bayes' rule, this yields
+	
+	\begin{equation*}
+		\begin{split}
+		P(Sick|+)&=\frac{P(+\cap Sick)}{P(+)}=\frac{P(Sick)P(+|Sick)}{P(+)}\\
+		&=\frac{P(Sick)P(+|Sick)}{P(+|Sick)P(Sick)+P(+|\overline{Sick})P(\overline{Sick})}\\
+		&= \frac{0.01\cdot 0.9}{0.9\cdot0.01 + 0.15\cdot0.99}\approx0.057 \text{ .}
+		\end{split}
+	\end{equation*}
+	As you can see from the example, to apply Bayes' rule in practice, I used the multiplication rule to find numerator and both the law of total probability and the multiplication rule to find the denominator. Being sick or not being sick is indeed a partition of the whole probability space and this partitioning allowed me to use the law of total probability.  
+	
+	\begin{table}
+		\caption{Test result probabilities}
+		\label{tabel:examplebayes}
+		\begin{center}
+		\begin{tabular}{ |c|c|c| } 
+		 \hline
+	 	   & Sick & Not sick \\ 
+	 	 \hline
+	 	+ & 0.9 & 0.15 \\ 
+	 	- & 0.1 & 0.85 \\ 
+	 	\hline
+		\end{tabular}
+		\end{center}
+	\end{table} 
+	
+		\section{Decision theory?}
+	
+	\chapter{Classification} \label{chap:classification}
+The idea behind classification is that there is an unknown probability distribution $P(X_1,...,X_n,Y)$, from which we have drawn samples/data points $d(x_1,...,x_n,y)\equiv d(\bm{x},y)$. We'll call the $x$'s the features/input and $y$ the class/output. In the future we will be given specific feature values, and we want to predict what the class is. A classifier does exactly that. It is a function that maps features on classes. The class variable always takes discrete values, the features are allowed to be both discrete or continue. An example of such a distribution-features-class triplet could be a situation where the class is a person's favorite movie. The features could then be things like \lq likes this actor', \lq likes that actress', \lq likes westerns', etc. The distribution itself does not really exist, but it is represented by all people that have a favorite movie. We'll call such a representation of the distribution the population. It is typical in classification problems that the different classes are given. For the features you will often be able to choose whether to include a feature in the problem or not. For example, if you were with Netflix, you cannot go around the fact that you are interested in the movies your clients like. But it is up to you then to decide if features like gender or age of the client play a role in this problem. 
+		
+	\section{The hypothesis set}
+Setting up the domain and codomain is one part of the initialization phase. Another part is determining what the hypothesis set $\mathcal{H}$ is. This hypothesis set is not anything more than a set of functions, also called hypotheses in this context,  with an appropriate domain and codomain. When everything is done, we will be given one final function/hypothesis $g$ that we will use to make future predictions. The idea of the hypothesis set is that the final hypothesis $g$ must be in our hypothesis set $\mathcal{H}$.
+\paragraph{Example: linear functions.}
+Take the specific case where we have 2 continuous features $x$ and $y$ which we will use to predict a binary class $c \in \{-1,1\}$. Note that the domain here is $\Re^2$, ie the plane. A possible hypothesis set for this problem could be
+\begin{equation}
+h:= (x,y) \rightarrow \text{sign}(w_0 + w_1 x + w_2 y),
+\end{equation}
+where $(w_0,w_1,w_2) \in \Re^3$, and
+
+\begin{alignat*}{2}
+\text{sign}(z) &= 1 &&\text{\qquad if } z \geq 0\\
+& = -1 &&\text{\qquad else. }
+\end{alignat*}
+This hypothesis set corresponds to all lines in the plane. Points at one side of a line are mapped to one class while points at the other side are mapped to the other class. 
+	
+	\section{Cost and utility function}
+A short recap of the situation. We are given a list of feature values $\bm{x}$ and will be asked to predict the class $y$. Giving a correct prediction of one class is a good thing, and giving a correct prediction of another class is also a good thing. However these 2 good things are not necessarily equally good. The same goes up for wrong predictions, 2 different wrong predictions are not necessarily equally avoidable either. The utility function is a way of putting numbers on how pursuable good is and how avoidable bad is. More precise, in the context of classifiers, a utility function $U(\hat{C},C)$, accepts 2 values on the same domain. The 1st variable is what the classifier predicts, the 2nd variable is what the class really is. The output of this utility function is a scalar that can be interpreted as some reward-like variable we'd like to be high in future events.\\
+Utility functions can often be given in a table form. An example is given in table (\ref{tableclassification}). The classifier will have to predict whether tomorrow will be rainy or sunny. Correct predictions are treated equally good and are given a reward of 1. Predicting rain when there really will be sun is a little bit annoying, so it gets a punishment of -1. However, that wouldn't be as bad as predicting a sunny day when it really will be rainy so this one gets a punishment of -2.
+\paragraph{Expected utility of a single hypothesis.} We can now define the expected utility $E_{\tiny{U}}$ of a single hypothesis $h$,
+\begin{equation}
+E_{U}(h)=\lim_{N \to \infty} \frac{1}{N} \sum_{i=1}^{N}U(h(\bm{x}_i),y_i),
+\end{equation} 
+where $\bm{x}_i$ and $y_i$ are drawn from an unknown distribution $P(X,Y)$. In words, this expected utility is the value we would obtain if we were to run a single hypothesis $h$ on the entire (infinite) population and calculate our average utility with this hypothesis. In other words, it is how much utility you will get on average if you use this hypothesis as classifier.
+	
+	\section{Generalization and bias-variance}
+	\paragraph{Generalization}
+If you have the expected utility of every hypothesis in your set, solving the problem becomes trivial. You then just pick the hypothesis with highest expected utility. However, we never have the real expected utility, what we do have is a dataset $\mathcal{D}$. We can calculate the average utility for every hypothesis on this dataset. We will name the average utility on the dataset $\hat{E}_{\tiny U}(h)$. The hat indicates that it is not a real expected value but an estimate based on the dataset. The generalization error $e$ is then defined, with $g$ the final hypothesis
+\begin{equation} \label{generror}
+e = \hat{E}_{\tiny U}(g) - E_{\tiny U}(g).
+\end{equation}
+When we come up with a final hypothesis, we want some guarantees that the generalization error is small. Something we can do to have a lower generalization error is to gather more data. Another thing is working with smaller hypothesis sets.\\
+If we rewrite eq (\ref{generror}), we obtain
+\begin{equation} 
+E_{\tiny U}(g) = \hat{E}_{\tiny U}(g) - e. 
+\end{equation}
+This means that our real performance is the difference of the performance on the dataset minus the generalization error. We want the generalization error $e$ to be small and at the same time the $\hat{E}$ term to be large. This is a trade off. A large hypothesis set allows good performance on the training set (large $\hat{E}_{\tiny U}(g)$) but impairs the ability to generalize (large $e$ as well). On the other hand, small hypothesis sets have a poor performance on the training set but generalize better.
+\paragraph{Bias and variance}
+I will call the target function $f_t$ the function that satisfies
+\begin{equation}
+E_{U}(f_t) \geq E_{U}(g),
+\end{equation}
+where $g$ is just any function with the correct domain and codomain. The target function is the best function we can have for a given set of features. When this function is not in the hypothesis set we say that we have bias. If you now call $h_{\text{best}}$ a hypothesis that satisfies
+\begin{equation}
+E_{U}(h_{\text{best}}) \geq E_{U}(h),
+\end{equation}
+where here $h$ is any other function in the hypothesis set. This is the best function inside the hypothesis set. The amount of bias $b$ can then be defined as
+\begin{equation}
+b = E_{U}(f_t) - E_{U}(h_{\text{best}}).
+\end{equation}
+We will refine this definition a bit in the next section, because the bias has some dependence on the training algorithm as well. To explain what the variance is, think of the hypothesis set as being a darts board. The bulls eye corresponds to the best hypothesis $h_{\text{best}}$. Throwing a dart is then the equivalent of coming up with a final hypothesis. Now suppose that on average you throw in the center, ie on average you have the best hypothesis of the set. But that does not mean you are doing anything good. Fig (\ref{dartsvariantie}) shows the situation why not. Both throw on average to the center, but you'd be happier with the first one in your team.
+We can intuitively decompose the average utility of a the final hypothesis $U_{\text{av}}$ on a way like
+\begin{equation}
+U_{\text{av}} = U_{\text{max}} - U_{\text{bias}} - U_{\text{var}}.
+\end{equation}
+This puts the trade off in a different perspective. Training on more data leads to a lower $U_{\text{var}}$ but leaves $U_{\text{bias}}$ unaffected. Working with larger hypothesis sets will in general increase variance and reduce bias, but this depends on the training algorithm as well.  
+	\section{Training algorithm}
+
+	\section{Cross-Validation}
+
+\chapter{Naive Bayes classifier} 
+A Naive Bayes classifier is, like all classifiers, a function. This classifier works in $2$ steps. First it maps its input onto a set of probabilities, $1$ for each of what we will call the classes (of the object). In a 2nd step, the classifier will use a decision rule to pick one of the classes, based on the previously calculated probabilities. A popular decision rule is to pick the class that has the highest probability, aimed at maximizing the number of correct classifications. One of the things we will do with this classifier, is to play with different decision rules. We'll also introduce indecisiveness, that is we allow the classifier to say  \lq I don't know what class this object belongs to'. The classifier will eventually have to estimate some parameters, which will end up not being different from certain probabilities.
+
+\section{Bayes classifier}
+If you would construct a Bayes classifier yourself, one of the things you will have to know is $P(C|F_1,F_2,...,F_n)$. Read this as the probability that C is in a certain class, given a combination of some features, the $F_i$'s, occurred. Comma's between the $F_i$'s have the same meaning as the intersection operator \lq $\cap$' in this context. A Bayes classifier will calculate this conditional probability by using, surprisingly, Bayes' rule. After applying the multiplication rule on the numerator, the formula becomes
+\begin{equation} \label{eq:bayesclassifier}
+P(C|F_1,F_2,...,F_n)=\frac{P(C)P(F_1,F_2,...,F_n|C)}{P(F_1,F_2,...,F_n)} \text{ .}
+\end{equation}
+The denominator will always be calculated by using the law of total probability, conditioning on the class. Now let's take a look at the expression $P(F_1,F_2,...,F_n|C)$. This is a function with a discrete domain $D=\{C \times F_1 \times F_2 \times ... \times F_n\}$ and continuous codomain $Co=[0,1]$. In general, machine learning methods do not try to construct a look-up table of input-output relations. Instead, typical methods parametrize an unknown function eg with radial basic functions (see also chapter \ref{chap:classification} for more information about this). We will do something similar here. But before simplifying things, let's manually count how many parameters we'd currently have to estimate. Note that these parameters I am talking about are not different from the probabilities of expression (\ref{eq:bayesclassifier}). Say the class we are interested in has $n_c$ possible values and we have $N$ features, with each feature having $n_i$ possible values. The denominator of (\ref{eq:bayesclassifier}) can be calculated if we can calculate the nominator, via the law of total probability, so let's not spend a parameter on the denominator. $P(C)$ is completely determined by $n_c-1$ parameters. To determine $P(F_1,F_2,...,F_n|C)$ we have to estimate for every element in C, $n_1 \cdot ... \cdot n_N -1$ parameters. Add everything together and we end up with $n_c \cdot n_1 \cdot ... \cdot n_N -1$ parameters to estimate. It should be clear that this number easily blows up because of the multiplications. This number will be reduced by the assumption of conditional independence as explained in section \ref{sec:conditionalindependence}.
+\section{Conditional Independence} \label{sec:conditionalindependence}
+Conditional independence is the assumption that makes the Bayes classifier a Naive Bayes classifier. To calculate the Bayesian probability we had the troubling function $P(F_1,F_2,...,F_n|C)$. Now let's expand this thing by applying Bayes' rule first and then the multiplication rule multiple times.
+\begin{equation*}
+\begin{split}
+P(F_1,F_2,...,F_n|C)&=\frac{P(C \cap F_1 \cap ... \cap F_n)}{P(C)}\\
+&=\frac{P(F_1|F_2 \cap ... \cap F_n \cap C)P(F_2\cap ...\cap F_n \cap C)}{P(C)}\\
+&=\frac{P(F_1|F_2 \cap ...\cap F_n \cap C)P(F_2|F_3 \cap ...\cap F_n \cap C)P(F_3 \cap ... \cap F_n \cap C)}{P(C)}\\
+&=...\\
+&=\prod_{i=1}^{n}{P(F_i|\bigcap_{i+1}^{n}{F_i}\cap C)}
+\end{split}
+\end{equation*}
+The defining assumption that we will call the conditional independence assumption is
+\begin{equation}
+P(F_j|\bigcap_{i \not= j}^{}{F_i}\cap C)=P(F_j|C)\text{,}
+\end{equation}
+where the intersection can be taken over any subset of $F_i$'s. This way equation (\ref{eq:bayesclassifier}) reduces to
+\begin{equation} \label{eq:genbayes}
+P(C|F_1,...,F_n)=\frac{\prod\limits_{i}^{}P(F_i|C)}{\sum\limits_{j}^{}\prod\limits_{i}^{}P(F_i|C_j)} \text{ .}
+\end{equation}
+This is the general form of the Naive Bayes classifier and will be used thoroughly. The numbers of parameters to estimate is reduced. Take the same example where we had $N$ features, with each feature $n_i$ possible values and $n_c$ classes. The total number of parameters V to estimate then becomes 
+\begin{equation}
+V=n_c(n_1 + ... + n_N - N)+n_c-1.
+\end{equation}
+The $-N$ in the sum arise from the N relations where $\sum P(F_i|C)=1$. Whereas in the case without the independence assumption we had as general formula for number of parameters $V'$,
+\begin{equation}
+V'=n_c(n_1 \cdot ... \cdot n_N)-1.
+\end{equation}
+\section{Examples} 
+In this section I will show some fictitious examples to get some better understanding of the whole mechanism, when it can fail and when it should not fail. All features and classes in the examples will be binary unless stated otherwise, a binary feature I will call an attribute.\bigskip
+
+\textbf{Example 1.} This example illustrates how 2 uninformative attributes are not so uninformative after all because the have perfect complementary information. In the setup we have 2 attributes $A$ and $B$ and a class $C$ such that $$P(C)=P(A|C)=P(A|\overline{C})=P(B|C)=P(B|\overline{C})=\frac{1}{2} $$ 
+\begin{equation*}
+\begin{split}
+& A \text{ and } B \Rightarrow C \\
+& \overline{A} \textrm{ and } \overline{B} \Rightarrow C \\
+& A \textrm{ xor } B \Rightarrow \overline{C}.
+\end{split}
+\end{equation*}
+In this situation the naive classifier will always tell us that $P(C|A,B)=\frac{1}{2}$. If instead the classifier would be allowed to drop the conditional independences, the function becomes deterministic and we can obtain a perfect accuracy. In situations like these we should join the two attributes to one feature that takes 4 values, 1 for every combination of the attributes. \bigskip
+
+\textbf{Example 2.} This example is somehow the adverse of the previous. We begin with 2 truly conditional independent attributes A and B. Let
+\begin{equation*}
+\begin{split}
+P(A|C)=P(B|C)=P(\overline{A}|\overline{C})=P(\overline{B}|\overline{C})&=0.8\\
+P(\overline{A}|C)=P(\overline{B}|C)=P(A|\overline{C})=P(B|\overline{C})&=0.2\\
+P(C)&=\frac{1}{2}\text{ .}
+\end{split}
+\end{equation*} 
+We calculate the conditional probabilities of C, 
+
+\begin{equation*}
+\begin{split}
+& P(C|A,B)=\frac{0.5 \cdot 0.8 \cdot 0.8}{0.5 \cdot 0.8 \cdot 0.8 + 0.5 \cdot 0.2 \cdot 0.2 }= 0.941 \\
+& P(C|A,\overline{B})=P(C|\overline{A},B)=0.5 \text{ (because of the symmetry) }\\
+& P(C|\overline{A},\overline{B})=1- P(C|A,B)=0.059 \text{ (because of the symmetry).}
+\end{split}
+\end{equation*}
+Now we want to do better than that. I propose we add an attribute $A'$ to the classifier. The problem with this attribute $A'$ is that it is perfectly correlated with attribute A. Because the relation $(A \Leftrightarrow A')$, this one does actually not learn us anything at all and the real probabilities do not change. However, the estimated ones will.
+\begin{equation*}
+\begin{split}
+& P(C|A,B,A')=\frac{0.5 \cdot 0.8 \cdot 0.8 \cdot 0.8}{0.5 \cdot 0.8 \cdot 0.8 \cdot 0.8 + 0.5 \cdot 0.2 \cdot 0.2 \cdot 0.2 } = 0.985\\
+& P(C|A,\overline{B},A')=\frac{0.5 \cdot 0.8 \cdot 0.2 \cdot 0.8}{0.5 \cdot 0.8 \cdot 0.2 \cdot 0.8 + 0.5 \cdot 0.2 \cdot 0.8 \cdot 0.2}=0.8\\
+& P(C|\overline{A},\overline{B},\overline{A'}) = 1-P(C|A,B,A') = 0.015 \text{ (because of the symmetry).}
+\end{split}
+\end{equation*}
+If we compare the probabilities we'd like the classifier to give us and the ones with the extra, but very dependent, feature, we see the mechanism of how dependent features can bias probabilities.
+
+\section{Decision rules}
+For the time being, we assume perfect knowledge about $P(C|F)$ and focus our attention on how to decide. I'll show 3 decision rules, where the second and third rule will appear to be equivalent generalizations of the first one. To avoid confusion, class decisions made by the classifier will be accompanied with the hat symbol, so read $\hat C$ like \lq output of the classifier is $\hat C$'.  
+
+\paragraph*{Maximize total accuracy}
+A first way of picking a class $C$, is to pick the one for which $P(C|F)$ is highest. Symbolically, this rule gives
+\begin{equation} \label{maxtotalaccuracy}
+\hat{C}=\argmax_C P(C|F).
+\end{equation}
+I will show informal why this rule gives the highest number of classifications in the long run, also called total accuracy. Remember that for a frequentist there is no difference between $P(C)$ and $\lim\limits_{N \rightarrow \infty}\frac{N_C}{N}$, where $N$ is the total amount of cases presented and $N_C$ is the amount of times the object turns out to be in class $C$. This interpretation allows us to calculate the total accuracy,
+\begin{equation} \label{maxacc}
+TotAcc = \sum_{i}^{} \max_C P(C|F_i) P(F_i).
+\end{equation}
+The \lq max' comes from the decision rule. Given the probabilities $P(C|F_i)$, we pick the class with the highest probability. The value of $\max_C P(C|F_i)$ is then the accuracy we would obtain if only the $F_i$ feature combination would occur. What I do then, is to take a weighted sum of these partial accuracies over all possible feature combinations that can occur. The weights, which are the $P(F_i)$'s, represent the amount of times we will have these corresponding partial accuracies. If we now look at equation (\ref{maxacc}), the only way the decision rule affected the total accuracy is when we took the maximum of $P(C|F)$. We had no saying in the $P(F_i)$'s, the world decides these values for us. Now we see that no other rule than picking the class with highest probability can give a higher total accuracy.
+
+\paragraph*{Threshold values}
+We generalize the maximize total accuracy decision rule (\ref{maxtotalaccuracy}) with threshold values as follows
+\begin{align} \label{tresholds}
+\hat{C}&=\argmax_{C \in a} P(C|F)\text{, where}\\
+a &= \{C \text{ for which } P(C|F)>t_C \} 
+\end{align}
+In words this means that if $P(C|F)$ is larger than some threshold $t_C$, the classifier puts C in a set of candidates. Note that $t_C$ may be different per class. Then it picks, as before, the class with highest probability in this set of candidates. An alternative to this would be to not choose when there is more than 1 candidate, however this does not generalize the first decision rule very well. The situation might occur that none of the probabilities passes its threshold and the set of candidates is empty. We call the classifier undecided in these situations. With decision rules that allow indecisiveness, we must clearly distinguish between the accuracy and total accuracy. In the following, let $Acc$ be the accuracy, $TotAcc$ the total accuracy, $d$ stands for decisiveness, $N_+$ is the number of correct classifications, $N$ is the number of cases presented and finally $N_d$ is the number of cases that were decided. Then we have the relations
+\begin{equation} \label{tresholdnotations}
+\begin{split}
+Acc &= \frac{N_+}{N_d}\\
+TotAcc &=\frac{N_+}{N}\\
+d &= \frac{N_d}{N}.
+\end{split}
+\end{equation} 
+
+\paragraph{Maximize expected utility}
+In this context, the utility function $U({\hat{A}},C)$ should be read as what you will get as payoff (utility) when an agent (the classifier) decides to undertake action $\hat{A}$ and the class ends up being $C$. After we observed the feature combination $F$ and the probabilities $P(C|F)$ are calculated, we can calculate expected payoffs for different actions $\hat A$
+\begin{equation}
+E_{\mbox {\tiny U}}(\hat A|F)=\sum_{i}^{}U(\hat A,C_i)P(C_i|F).
+\end{equation}
+The rule here is to pick the action with highest expected value
+\begin{equation}
+\hat A = \argmax_{\hat A}E_{\mbox {\tiny U}}(\hat A|F).
+\end{equation}
+I'd like to stress that although $C$ can only take a number of values equal to the number of classes, $\hat A$ can take any number of values with general utility functions. This is because $\hat A$ does not represent a class with utility functions but an action that someone undertakes. Here, we will only work with utility functions where $\hat A$ can take the same values as $C$ plus 1 extra value, corresponding to the no decision made situation. The action in the utility function is then equivalent to the classifier (not) choosing a class. This way $\hat A = \hat C$, where $\hat C$ is still the classifiers output.
+
+\section{Training the classifier}
+So far, I have ignored the way we obtain the probabilities $P(C)$ and $P(F|C)$. In this section we look at some possibilities for getting these values.
+\paragraph{Guessing}
+ If someone has no data available but happens to be an \lq expert' in the matter, he can try to guess the probabilities. Whether this is a good idea might depend on the \lq expert'. I included this method just to show that the next one is not unique.
+\paragraph{Use data}
+In normal situations we have a set of input-output/feature-class pairs. To estimate all probabilities $P(F|C)$, we will give every feature its own table, I'll call these the feature tables. The number of rows in each one of these is then equal to the number of values that particular feature can have. The number of columns are the same for every table and are equal to the number of classes. Now we have to fill in some numbers in the tables. We do this by going over the given feature-class pairs one by one. One of these pairs looks like $(f_1,f_2,...,c)$. Then, we go for every feature to its table and add 1 to the entry of which the row and column correspond to the one's of the feature-class pair we were considering. Table \ref{tabeltraining} is an example of how one such feature table looks like after the numbers are filled in. Estimating the actual probabilities goes as follows. The probability $P(F_1 = f_1 | C = c)$ eg is estimated by looking in the table of feature $F_1$. In this table take the number of the row associated with $f_1$ and column associated with $c$ and divide this number by the sum of numbers in the column of $c$. The probabilities $P(C)$ can be estimated by looking in any one of the tables. $P(C=c)$ is estimated by taking the sum of the elements of the column corresponding to $c$ (in any table) and divide this number by the sum of all elements in the table. I illustrate this method by a simple example, see also table \ref{tabeltraining}. This would be the feature table for a second feature, which can take 3 values and were we have 3 classes. If we were interested in, let's say, $P(F_2=b|C_3)$ the calculation would be
+$$
+P(F_2=b|C_3) = \frac{8}{7+8+3}.
+$$
+The probability of $P(C = C_2)$ would then become
+$$
+P(C = C_2) = \frac{1+2+4}{45},
+$$
+because the sum of all elements in the table is 45.
+\begin{table} \label{tabeltraining}
+\caption{Feature table}
+\begin{center}
+\begin{tabular}{c|c c c}
+    	  & $C_1$ & $C_2$ & $C_3$\\  \hline
+ $F_2$= a & 5     & 1 	  & 7 \\
+ $F_2$= b & 6     & 2 	  & 8 \\
+ $F_2$= c & 9     & 4 	  & 3 \\
+ 
+\end{tabular}
+\end{center}
+\end{table} 
+\newline
+This simple illustration should make an nice property of the Bayes classifier clear. Namely, we can train it by reading a line of the dataset, do a single plus one addition in every one of our feature tables and repeat for all data available in the world. In the end, or at any time we want, we do only a small amount of summations and divisions to get the probabilities. This very simple training algorithm has the property that the time it takes to train is proportional with the size of the dataset.
+
+\paragraph{Laplace smoothing}
+
+
+
+
+
+
+\chapter{Imprecise probabilities}
+	(long intro)
+	\section{Formalisms}
+	\section{Geometric interpretation}
+
+
+\chapter{Imprecise Naive Bayes classifier}
+	(long intro)
+	\section{Decision rules}
+	\section{Training algorithm}
+
+\chapter{Performance and comparison of precise and imprecise methods}
+	(short intro)
+	\section{Measures of performance}
+	\section{Precise Naive Bayes}
+	\section{Imprecise Naive Bayes}
+	\section{Discussion}  %
+
+
+\end{document}
