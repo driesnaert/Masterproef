@@ -2,9 +2,11 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{bm}
+\usepackage{amssymb}
 
 
 \DeclareMathOperator*{\argmax}{argmax}
+
 
 \theoremstyle{definition}
 \newtheorem{exmp}{Example}[section]
@@ -125,7 +127,7 @@ U_{\text{av}} = U_{\text{max}} - U_{\text{bias}} - U_{\text{var}}.
 \end{equation}
 This puts the trade off in a different perspective. Training on more data leads to a lower $U_{\text{var}}$ but leaves $U_{\text{bias}}$ unaffected. Working with larger hypothesis sets will in general increase variance and reduce bias, but this depends on the training algorithm as well.  
 	\section{Training algorithm}
-The training algorithm specifies how we will pick a hypothesis from the set. I illustrate how the same hypothesis set can have 2 different training algorithms. The goal will be to differentiate between 2 classes, indicated in the figures with crosses and circles. 
+The training algorithm specifies how we will pick a hypothesis from the set. I illustrate how the same hypothesis set can have 2 different training algorithms. The goal will be to differentiate between 2 classes, indicated in the figures with crosses and circles. We will make the assumption that every dataset is always linear separable. This means that we will always be able to draw at least 1 line that separates the crosses and circles.
 \paragraph{title} 
 
 	\section{Cross-Validation}
@@ -276,6 +278,7 @@ because the sum of all elements in the table is 45.
 This simple illustration should make an nice property of the Bayes classifier clear. Namely, we can train it by reading a line of the dataset, do a single plus one addition in every one of our feature tables and repeat for all data available in the world. In the end, or at any time we want, we do only a small amount of summations and divisions to get the probabilities. This very simple training algorithm has the property that the time it takes to train is proportional with the size of the dataset.
 
 \paragraph{Laplace smoothing}
+Laplace smoothing means that we do not initialize our feature tables with all zero's but with a small number $\alpha$, typically around 1. The interpretation is that we start from a prior belief that all probabilities are uniformly distributed. When experimental results flow in, we adapt our belief more and more towards what we have observed and further away from the prior belief. Take the coin flip example why this is not so stupid. You flip a coin one time and it lands tails up. This wouldn't make you conclude that $P(\text{tails})$ is 1. 
 
 
 
@@ -283,14 +286,59 @@ This simple illustration should make an nice property of the Bayes classifier cl
 
 
 \chapter{Imprecise probabilities}
-	(long intro)
-	\section{Formalisms}
-	\section{Geometric interpretation}
+This chapter introduces and motivates imprecise probabilities. We will do the motivation through a thought experiment. Let's say you are in the situation where you are given a coin and some time to test the coin. After a while of testing the coin, you will be offered a series of bets whether a coin flip with this coin will be heads or tails. If you had been flipping the coin for days, you would probably get away with a strategy where you bet large amounts of money. That is because after days of flipping that one coin, you have a very good idea about the probabilities of the next coin flip. You can then calculate the expected payoff and bet only if the payoff is positive and not care about anything else. Now suppose you only had 20 seconds to test the coin. You'd still have some idea about the probabilities of the next toss. However, you are not assured to get away with the same strategy in this situation as when you were given days to test the coin. The reason is that based on those 20 seconds of testing, you have some idea about the probabilities of the next flip, but you can't really pinpoint some exact, \lq precise' probability on it. This is why we introduce imprecise probabilities. Because it offers a way out of having to calculate expected payoffs based on probabilities we are not sure off.\\
+We can look at imprecision from a different viewpoint. Say we are in the situation where no testing or whatsoever has been done about a repeating process. This means we have no reason to have any belief at all about the probabilities of this process. Some people might say that you have to express this state by assuming uniform probabilities and update the probabilities when experimental results come in. For the coin that would give initially $P(\text{heads})=P(\text{tails})=1/2$. You would like to do some betting against these kind of people, first you fix the coin such that $P(\text{head})=1$, then offer them bets that give a positive expected payoff assuming uniform distributions. Our imprecise alternative is to express a totally unknowing state by saying \lq the probabilities could be anything between 0 and 1', ie for the coin $P(\text{heads}) \in [0,1]$. When you start experimenting, you can shrink that interval, and if you experiment a bit more, you can shrink it a bit more. This is indeed opposed to the first situation, where you start with a only one estimation and review that estimation based on experiments. Downside of imprecision is that taking decisions like whether to accept or decline bets are not trivial anymore. That's one thing we'll have to fix.
 
+	\section{Credal set}
+We do not limit our belief about the outcome of an event to one probability mass function but to a whole set of mass functions. We'll call such a set of mass functions a credal set $\mathcal{C}$. You can interpret the idea of credal set loosely as \lq I suspect that the true probability mass function is in my credal set'.\\
+We will limit the credal sets we work with to convex one's. This means that
+\begin{equation}
+\begin{split}
+& \text{ if } P_1(X)  \text{ and } P_2(X) \in \mathcal{C}, \; \text{then} \\
+& P_3(X) = \alpha P_1(X) + (1 - \alpha)P_2(X) \in \mathcal{C}, \; \alpha \in [0,1].
+\end{split}
+\end{equation}
+Note that $P_3(X)$ satisfies the requirements to be a probability mass function, $P_3(X)>0 \text{ and } \sum_{x}^{}P_3(x) = 1$.\\
+You can talk about the expected value or expected utility of a decision of one single element in a credal set but the expected utility of a credal does not exist.
+  
+	\section{Geometric interpretation}
+We will represent probability mass functions as points that lie within a regular simplex. First we'll explain what a regular simplex is. A simplex is a generalization of triangles and tetrahedrons to higher, or lower, dimensions. Concretely, an n-simplex consists of $n+1$ outer points which are linearly independent. The simplex is then formally defined as the smallest subset of the n-dimensional euclidean space that contains the outer points and is convex. Less formally it is just the extension of triangles and tetrahedrons to higher dimensions. A property of an n-simplex is that its outer faces are $(n-1)$-simplexes. A regular simplex is then the generalization of a regular triangle/tetrahedron, where all edges must have the same length. 
+
+\paragraph{Example: the triangle}
+Take the triangle, which is a 3-simplex. It has $2+1=3$ outer points and if you would remove just a tiny bit of a triangle, it is either not convex anymore or you have removed one of the outer points. So it is the smallest subset of the plane that contains its corner points and is convex. The outer faces of the triangle are the line segments that connect the corner points, and a line segment is indeed a 2-simplex.
+
+\paragraph{}
+There's a theorem that states that for every point inside a regular simplex the sum of the distances to the outer surfaces is a constant. We can now normalize the coordinate system such that this sum of the distances is always 1. This we say that a point $p$ within a regular normalized n-simplex is can be viewed as a probability mass function for an event with n possible outcomes. Every outer face of the simplex then corresponds to one of the outcomes, and the probability of this outcome is the distance between the point and the outer surface. It is also the other way around, every possible mass function can be represented as a point within a regular simplex (no proof). A credal set has then a representation as a convex (geometrical meaning) set within a regular normalized simplex.
+
+\paragraph{Example: event with three outcomes}
+%tekening en uitleg    
+	
+	\section{Two types of uncertainty}
+Working with credal sets leads to 2 reasons to be uncertain about the outcome of an event. The first reason is the same as with precise probabilities. If a coin has a probability of $1/2$ to land tails up, you are uncertain about the outcome, but you'd still know how to bet. If a coin has an imprecise probability between 0 and 1 to land tails up you are uncertain about the outcome as well, but you wouldn't know how to place bets this time. This illustrates these 2 uncertainties are somehow different. In the precise case your uncertainty is because the model you use to predict the outcome of events is limited in its predictive power. In the imprecise case, your have an additional uncertainty because you don't know the parameters (=probabilities) of your model. I will call the type of uncertainty associated with precise probabilities a \lq precise uncertainty'. And analog, I will call the additional uncertainty that comes with credal sets an \lq imprecise uncertainty'.
+
+
+	\section{Decision theory}
+\paragraph{}
+Just as the case is with precise probabilities, we will use credal sets to make decisions. Because you can't talk about the expected value/payoff of a credal set, we introduce some new decision rules. The convention I will use is that the final \lq decision' will always be presented as a list $\mathcal{A}$ of admissible sub choices. The set of sub choices consists of all possible outcomes plus the additional choice of not deciding. If a sub choice is admissible, it is included in the final list and vice versa, if a choice has made it to the final list it is said to be admissible. The set $\mathcal{A}$ of all admissible choices must be interpreted as sub choices between which we couldn't make out which is the better one. If a case ends up with more than one admissible choice and/or the choice of not deciding is admissible, we say a case is undecided.
+\paragraph{}
+We will recognize the two types of uncertainty described above in our eventual decisions. For simplicity, take an event with 2 outcomes, A and B. We then have 3 sub choices: A, B and C. The sub choice C is the additional choice where we explicitly do not decide. If the admissible choices are $\mathcal{A} = \{A,B \}$, we don't decide. The reason is that we are not sure if either choice A or B is the best one to pick. It will turn out this is a kind of imprecise uncertainty. Now, if the admissible choices would have been $\mathcal{A}=\{C\}$, we don't decide because not deciding is somehow the best choice. The reason we choose not to decide here, is because not deciding gives us better payoffs, not because we can't choose between A or B. This will turn out to be a case of precise uncertainty. The admissible choices can also be of a form like $\mathcal{A}=\{A,C\}$. This means we are not sure whether to choose A or not to decide. In this case we have both an imprecise and precise uncertainty, the rule here should be to not decide. 
+
+
+\paragraph{Interval Dominance}
+Definitely the simplest decision rule of all. What we do is to search for every sub choice for a worst and a best case scenario. These worst and best case scenarios correspond to a (different) mass function in our credal set $\mathcal{C}$. The best case scenario for sub choice $x$, utility function $U$ inside credal set $\mathcal{C}$ will be written symbolically as $\overline{E_U^{\mathcal{C}}}(x)$, whereas the worst case is then written as $\underline{E_U^{\mathcal{C}}}(x)$. The formal definitions of these best and worst case scenarios are \begin{equation}
+\begin{split}
+\overline{E_U^{\mathcal{C}}}(x) &= \max_{f \in \mathcal{C}} E_U(x|f) \overset{short}{=} \overline{E}(x)\\
+\underline{E_U^{\mathcal{C}}}(x) &= \min_{f \in \mathcal{C}} E_U(x|f) \overset{short}{=} \underline{E}(x),
+\end{split}
+\end{equation}
+where $E_U(x|f)$ is the expected payoff for choice $x$, given mass probability $f$ and utility $U$. This way we can construct intervals for every choice, which are lower and upper bounds on the expected payoff for that choice. These intervals do not bound what we will get as payoff, only what we expect to get as a payoff. If $\underline{E}(A)>\overline{E}(B)$, we say that choice A interval dominates choice B. The rule to be an admissible choice using interval dominance is that a choice $x$ is admissible if it is not interval dominated by any other choice.
+
+
+
+\paragraph{E-admissibility} 
 
 \chapter{Imprecise Naive Bayes classifier}
 	(long intro)
-	\section{Decision rules}
 	\section{Training algorithm}
 
 \chapter{Performance and comparison of precise and imprecise methods}
